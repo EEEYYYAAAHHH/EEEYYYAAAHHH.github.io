@@ -1,0 +1,73 @@
+/*css plan*/
+
+/*full body?*/
+body 
+{
+	font-family: Arial, sans-serif;
+	background-color: #333333;
+	background-image: url("https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/logo.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	color: white;
+	margin: 0;
+	padding:0;
+}
+
+/* probably going to need CSS grid in order to put the pictures together */
+/* the shit i have to edit is "category", "gallery", and maybe "submit" */
+	
+/* header */
+.nav
+{
+	font-family: Times New Roman, sans-serif;
+	color: white; 
+	text-align: center;
+	font-size: 2.5;
+	letter-spacing: 3px; 
+}
+
+/* form */
+form
+{
+	font-family: Times New Roman, sans-serif;
+	color: white; 
+	text-align: center;
+	font-size: 1.2;
+	letter-spacing: 2px; 
+}
+/* gallery grid */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 10px;
+  padding: 10px;
+}
+.gallery img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+
+#category {
+  background-color: #222;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+/*
+input[type="submit"] {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+*/
+

@@ -1,0 +1,656 @@
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Algorithm Files</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!-- Header / Title Bar -->
+	<header class="nav">
+		<h1>THE ALGORITHM FILES</h1>
+	</header>
+
+	<div class="layout" role="presentation">
+		<!-- Need a left side list -->
+		<div class="sidebar">
+			<ol id="char-list">
+				<li class="placeholder">Grabbing info....</li>
+			</ol>
+		</div>
+
+		<!-- Need a right side detailed view -->
+		<div class="detail" id="detail">
+			<div class="detail-head">
+				<img id="p-portrait" alt="Portrait" />
+				<div class="identity">
+					<h2 id="p-name"></h2>
+					<p id="p-world"></p>
+					<div class = "info-row">
+					<ul id="p-stats"></ul>
+					<ul id = "p-moveset"></ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="bio">
+				<h3>Bio</h3>
+				<p id="p-bio">Choose a name on the left to view details.</p>
+			</div>
+
+			<div class="skills">
+				<h3>Skills</h3>
+				<ul id="skill-list"></ul>
+			</div>
+		</div>
+	</div>
+	
+
+	<script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+/////////////////////////////////////////////////////////////////
+script.js 
+// script.js
+//use the old one for reference...
+
+//wait until the page fully loads
+//helps avoid the page from not loading at all
+document.addEventListener("DOMContentLoaded", () => {
+  const listEl = document.getElementById("char-list");
+  const portraitEl = document.getElementById("p-portrait");
+  const nameEl = document.getElementById("p-name");
+  const worldEl = document.getElementById("p-world");
+  const statsEl = document.getElementById("p-stats");
+  const moveEl = document.getElementById("p-moveset"); 
+  const bioEl = document.getElementById("p-bio");
+  const skillsListEl = document.getElementById("skill-list");
+
+  //load the JSON file
+  //refer to CPP on how to load a file
+  fetch("gallery.json")
+    .then(response => response.json())
+    .then(data => {
+      listEl.innerHTML = ""; // clear placeholder
+
+      //loop through all characters and make list items
+	  //parsing maybe? 
+	  //its already parsed
+      data.forEach((character) => {
+        const li = document.createElement("li");
+        li.textContent = character.name;
+        li.classList.add("char-item");
+        li.addEventListener("click", () => showCharacter(character));
+        listEl.appendChild(li);
+      });
+    })
+	// need a error catch 
+    .catch(err => {
+      console.error("Error loading gallery.json:", err);
+      listEl.innerHTML = "<li class='error'>Failed to load character data.</li>";
+    });
+
+////////////////////////////////////////////////////////////////////////
+
+  //need a function to display a character’s details
+  //might need AI to help witht his part
+  function showCharacter(character) {
+    portraitEl.src = character.portrait;
+    //portraitEl.alt = `${character.name} portrait`;
+    nameEl.textContent = character.name;
+    worldEl.textContent = `World: ${character.world}`;
+
+    //fill in stats (power, fortitude, etc.)
+    statsEl.innerHTML = "";
+    for (const [stat, value] of Object.entries(character)) {
+      const statNames = ["power", "fortitude", "tactical acumen", "fighting skill", "range", "arts"];
+      if (statNames.includes(stat)) {
+        const li = document.createElement("li");
+        li.textContent = `${stat.toUpperCase()}: ${value}`;
+        statsEl.appendChild(li);
+      }
+    }
+
+    // Fill in moveset (array of strings in your JSON)
+    moveEl.innerHTML = "";
+    if (Array.isArray(character.moveset)) {
+      character.moveset.forEach(move => {
+        const li = document.createElement("li");
+        li.textContent = move;
+        moveEl.appendChild(li);
+      });
+    } else {
+      const li = document.createElement("li");
+      li.textContent = "No moves listed.";
+      moveEl.appendChild(li);
+    }
+
+    // Fill in bio
+    bioEl.textContent = character.bio;
+
+    // Fill in skills
+    skillsListEl.innerHTML = "";
+    if (Array.isArray(character.skills)) {
+      character.skills.forEach(skill => {
+        const li = document.createElement("li");
+        li.textContent = skill;
+        skillsListEl.appendChild(li);
+      });
+    }
+  }
+});
+
+
+
+//////////////////////////////////////////////////
+style.css
+/*css plan*/
+
+/*full body?*/
+body 
+{
+	font-family: Arial, sans-serif;
+	background-color: #333333;
+	background-image: url("https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/logo.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	color: white;
+	margin: 0;
+	padding:0;
+}
+/*.nav - the title bar*/
+.nav 
+{
+	font-family: Arial, sans-serif;
+	color: white;
+	text-align: center;
+	font-size: 1.5em;
+	letter-spacing: 3px; 
+}
+
+/*.layout* - how everything will be organized*/
+.layout
+{
+	display:flex;
+	height: 100vh;
+}
+
+/*.sidebar* - the list of characters on the left side*/
+.sidebar
+{
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+	color: white;
+	font-family: Arial, sans-serif; 
+	font-size: 1.6em;
+	/*width: 25%;*/
+	cursor:pointer;
+}
+
+/*.detail- the entire box on the right side*/
+.detail
+{
+	flex: 1;
+	padding: 20px;
+	color: white;
+}
+
+/*.detail-head*/
+.detail-head {
+  display: flex;           /* puts portrait and identity side-by-side */
+  gap: 16px;               /* space between portrait and text */
+  align-items: flex-start; /* align tops */
+  background: #222;        /* subtle panel background */
+  border: 1px solid #444;  /* light border for structure */
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;     /* space before Bio section */
+}
+/*identity*/
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;                /* space between name, world, and stats */
+  flex: 1;                 /* take remaining width */
+  min-width: 0;            /* allow text to wrap instead of overflow */
+}
+
+/*.bio*/
+
+/*.skills*/
+.bio, .skills {
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 16px;
+}
+
+.bio h3, .skills h3 {
+  margin: 0 0 8px 0;
+  border-bottom: 1px solid #3a3a3a;
+  padding-bottom: 6px;
+  font-size: 1.05rem;
+}
+
+
+/*#p-portrait*/
+#p-portrait {
+  width: 160px;
+  height: 300px;
+  object-fit: cover;       /* crop nicely without distortion */
+  border-radius: 8px;
+  border: 2px solid #00b8ff; /* accent frame */
+  background: #000;        /* fallback if image missing */
+}
+
+/*#p-name*/
+#p-name {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #00b8ff;          /* accent for the name */
+}
+/*#p-world*/
+#p-world {
+  margin: 0;
+  color: #c7d2db;          /* muted secondary text */
+  font-size: 0.95rem;
+}
+/*#p-stats*/
+#p-stats {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;  /* simple vertical list */
+  gap: 6px;
+}
+
+#p-stats li {
+  display: flex;
+  justify-content: space-between; /* label left, grade right */
+  align-items: center;
+  padding: 6px 8px;
+  background: #1b1b1b;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+}
+
+#p-stats .label {
+  color: #a8bbcc;          /* muted label */
+  text-transform: capitalize;
+}
+
+/* how do i get it to show up side by side, instead of a list completely?*/
+.identity .info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+/* Moveset list mirrors stats list */
+#p-moveset {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#p-moveset li {
+  padding: 6px 8px;
+  background: #101010;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  color: #d8e8f2;
+}
+
+/*p-bio*/
+#p-bio {
+  margin: 0;
+  color: #c7d2db;
+  line-height: 1.6;
+}
+/*#skill-list*/
+#skill-list {
+  margin: 0;
+  padding-left: 20px;      /* bullets offset */
+  color: #e9f1f8;
+}
+#skill-list li {
+  margin: 6px 0;
+}
+
+
+
+
+/////////////////////////////////////////////////////
+gallery.json
+[
+	{
+		"name": "Rev",
+		"world": "5580",
+		"power": "B",
+		"fortitude": "C",
+		"tactical acumen": "S",
+		"fighting skill": "S",
+		"range": "D",
+		"arts": "D",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Rev.png",
+		"bio": "The Doctor of World 5580. Despite his frail frame and lowered constitution, Rev always finds himself on the front lines, taking the enemy head on. Rev is the master of the Yan Sanda, Sarkaz Fighting Style, and Ancients Martial Art, making him a strong hand-to-hand combatant. Combine that with his tactical genius and he's a force of nature, made doubly lethal with his rocket punch.",
+		"skills": [
+			"Yan Sanda",
+			"Sarkaz Fighting Style",
+			"Ancient's Martial Art"
+		],
+		"moveset": [
+			"Left/Right + A- Snapping Kick: Rev charges forward kicks the opponent in the gut. Immune to low attacks.",
+			"Up + A- Rapid Fists: Rev charges forward, striking the opponent multiple times, stunning them.",
+			"Down + A - Rocket Punch: Rev charges and firing the gauntlet at the enemy before returning to him. Cannot attack while active. Super armor."
+		],
+
+		"tips": [
+			"Cancel certain attack chains by activating one of Rev's skills, mid-attack animation"
+		]
+		
+	},
+	{
+		"name": "Hisato",
+		"world": "2794",
+		"power": "A",
+		"fortitude": "A",
+		"tactical acumen": "S",
+		"fighting skill": "B",
+		"range": "D",
+		"arts": "D",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Hisato.jpg",
+		"bio": "The Doctor of World 2794. His body might be more machine than man, but it's the man that makes the machine. His cybernetics include a Projectile Launcher, ability to hack into any computer networks, including PRTS, and granting him a Third Eye perspective, seeing the world from a different perspective. He must remain careful as extended usage of these abilities might make him go Cyberpsychotic.",
+		"skills": [
+			"Projectile Launcher",
+			"Quick Hack",
+			"Sandevistan"
+		],
+		"moveset": ["Left/Right + A- Seize: Hisato force pushes enemies away from him",
+					"Up + A- Control: Hisato force pulls enemies toward him. Limited range",
+					"Down + A- Aftershock: Hisato hits the ground, creating a shockwave around him"],
+
+		"tips": [
+			"1. Hisato depends on being able to control the battlefield. Use Seize, Control or Sandevistan to manipulate the foes."
+		]
+	},
+	{
+		"name": "Fleur",
+		"world": "1339",
+		"power": "B",
+		"fortitude": "C",
+		"tactical acumen": "B",
+		"fighting skill": "A",
+		"range": "A",
+		"arts": "S",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Fleur.jpg",
+		"bio": "An Operator of World 1339. A vampire that survived the fall of Babel, Fleur is a master assassin, using her Blood Lotus abilities to deal excruciating pain to her enemies, making them feel weaker and lowering their damage output. In addition to her arts, she's well-versed in the art of the blade, using her nimbleness and lower profile to defeat her enemies.",
+		"skills": [
+			"Crimson Repulsion",
+			"Unblessed Bonds",
+			"'Until We Reunite'"
+		],
+		"moveset": ["Left/Right + A- Garden of Consciousness: Fleur drops a Blood Lotus at her location. If enemies pass this Blood Lotus, they are weakened",
+					"Up + A- Bleeding Heart: Fleur damages herself for increased damage. For every Blood Lotus nearby, she loses 15% less HP, up to three stacks per usage",
+					"Down + A- Bloodfall: Jump into the air and slam down on a location of Fleur's choosing, dealing damage and creating a Blood Lotus garden at the area"
+				],
+
+		"tips": [
+			"Bleeding Heart and Blood Lotus can be stacked on top of each other. Just keep in mind Fleur's HP"
+		]
+	},
+	{
+		"name": "Leo",
+		"world": "3116",
+		"power": "D",
+		"fortitude": "C",
+		"tactical acumen": "S",
+		"fighting skill": "B",
+		"range": "S",
+		"arts": "A",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Leo.jpg",
+		"bio": "The Doctor of World 3116. He is a quiet and reserved man who often times stands in one place, menacingly. However, the reason why is because his Arts or his abilities is the ability to create ink blot monsters called 'Flopes' to fight for him. Even without his Flopes, Leo is capable of defending himself from attackers as his arts are not limited to just creation.",
+		"skills": [
+			"Come Thunder",
+			"Come Lightning",
+			"Smite All"
+		],
+		"moveset": ["Left/Right + A- Summon Flope: Leo summons a Flope in front of him that will attack enemies. Prioritizes those closer to Leo. Max of 2",
+					"Up + A- Defend Flope: Leo can recall both Flopes to fight closer to Leo, protecting him from projectiles and nearby enemies",
+					"Down + A- Mimic Flope: Leo can tell one of the Flopes to mimic another actor's skill. Randomly chosen"],
+
+		"tips": [
+			"Leo is capable of performing his entire moveset all at once. Just keep in mind how many Flopes are deployed"
+		]
+	},
+	{
+		"name": "Fami",
+		"world": "1189",
+		"power": "D (S in Empowered Mode)",
+		"fortitude": "D (S in Empowered Mode)",
+		"tactical acumen": "S",
+		"fighting skill": "D",
+		"range": "D (S in Empowered Mode)",
+		"arts": "D (S in Empowered Mode)",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Fami.jpg",
+		"bio": "The Doctor of World 1189. By far, the most normal of the Doctors. While he has the same strategical acumen as the other Doctors, he lacks any fighting abilities or powerful Arts. Until someone makes the mistake of blaspheming his wife. When he enters this enraged state, he becomes impervious to all damage, either ignoring or healing the damage. Never mess with this Doctor.",
+		"skills": [
+			"Till Death Do Us Part",
+			"Blasphemers Shall Pay (Empowered Mode)",
+			"Stay Out of My Way (Empowered Mode LV2)"
+		],
+		"moveset": ["Left/Right + A- Haymaker: Fami lunges at the opponent and strikes them. Immune to low attacks. Stronger damage in Empowered Mode",
+					"Up + A- Cutting Wind: Fami spins, damaging foes around him. Stronger knockback in Empowered Mode",
+					"Down + A- Planted in the Earth: Fami does an axe kick that plants enemies into the ground if they get hit by it. Stuns in Empowered Mode"],
+
+		"tips": [
+			"When in base mode, Fami lacks all sorts of stats. Focus on collecting Morning Dews with 'Till Death Do Us Part' to feed the Empowered Mode"
+		]
+	},
+	{
+		"name": "Durante",
+		"world": "8526",
+		"power": "B",
+		"fortitude": "B",
+		"tactical acumen": "S",
+		"fighting skill": "A",
+		"range": "C",
+		"arts": "D",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Durante.jpg",
+		"bio": "The Doctor of World 8526. He and his world's Rhodes Island is dressed to survive an end-of-the-world scenario. He's decked out from head to toe in layers of armor that can protect him from Originium particles, from his air-tight clothes to his gas mask. Despite his armaments lacking any polish, he's a born survivor, capable of taking down threats both internal and external.",
+		"skills": [
+			"Hope in Despair",
+			"Light in Darkness",
+			"Life in Death"
+		],
+		"moveset": ["Left/Right + A- Home Run: Durante uses a bat that can knock foes far away from him",
+					"Up + A- Victorian Greeting: Durante uses a knife to slash and stab foes, dealing bleed",
+					"Down + A- Blessed by the Queen: Durante uses an imitation of the Sigh of Kings to deal heavy damage"],
+
+		"tips": [
+			"Durante is as tough as they come. Fear not getting inflicted with status effects"
+		]
+	},
+	{
+		"name": "Gri",
+		"world": "2753",
+		"power": "S",
+		"fortitude": "B",
+		"tactical acumen": "S",
+		"fighting skill": "A",
+		"range": "C",
+		"arts": "C",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Gri.jpg",
+		"bio": "The Doctor of World 2753. He's a man of little words, speaking only when needed or when his wife is mentioned. He has the power of two stands: one knight that gives him increased constitution and durability and another a jester that gives him increased ability to deal pain. While these abilities are amazing on their own, his control over both of them is what makes him a worthy threat. ",
+		"skills": [
+			"Stand Rush",
+			"Knightly Order",
+			"Final Laugh"
+		],
+		"moveset": ["Left/Right + A- Poke: Gri summons Knight to attack the enemy from afar. The tip of his sword deals heavy damage",
+					"Up + A- To the Stars: Gri uses his stands to fly into the air. I-frames towards the beginning of the move",
+					"Down + A- Hinder: Gri summons Jester to slash at the opponents' ankles, slowing movement speed"],
+
+		"tips": [
+			"Gri's Stands can take damage. If they take too much, they'll be disabled for a period of time."
+		]
+	},
+	{
+		"name": "Mic",
+		"world": "4853",
+		"power": "B",
+		"fortitude": "S",
+		"tactical acumen": "S",
+		"fighting skill": "A",
+		"range": "B",
+		"arts": "D",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Mic.jpg",
+		"bio": "The Doctor of World 4853. At first glance, this handsome man appears to be a billionaire playboy but underneath that persona is an ex-killer, capable of filling graveyards single-handedly. He specializes in firearms and close-quarters combat and his suit, while fashionable, is also functional. Bullet-proof and deadly and fiercely protective of his daughter, this Doctor can end you before you realize.",
+		"skills": [
+			"Someone please, Give This Man a Gun",
+			"I'm Thinking I'm Back",
+			"....Yeah."
+		],
+		"moveset": ["Left/Right + A- Throwing Knife: Mic throws a knife at the enemy, ignoring defense",
+					"Up + A- Counter Stance: Mic enters a counter stance that mitigates all damage and returns half to sender. Doesn't work on bosses.",
+					"Down + A- Tactical Reload: Mic reloads his gun at a faster speed."],
+
+		"tips": [
+			"Always be on the lookout for more Ammo"
+		]
+	},
+	{
+		"name": "Wither",
+		"world": "7194",
+		"power": "B",
+		"fortitude": "A",
+		"tactical acumen": "S",
+		"fighting skill": "B",
+		"range": "A",
+		"arts": "D",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Wither.jpg",
+		"bio": "The Doctor of World 7194. His scary appearance contradicts his actions. As a Doctor, he specializes in creating concoctions that grant many beneficial effects to anyone who takes it, making him a popular figure in his grimdark world. But expertise in how to heal others is also expertise in how to hurt others. His potions can also provide a plethora of sicknesses like poisons or viruses.",
+		"skills": [
+			"Hippocratic Oath",
+			"Guarantee of Death",
+			"Rise from the Ashes"
+		],
+		"moveset": ["Left/Right + A- Come Here: Wither strikes with a scythe that can be angled upwards or downwards",
+					"Up + A- Follow the Light: Wither fires a flare into the air that attracts low-level enemies for 20 seconds",
+					"Down + A- Death's Embrace: Wither heals himself and regens health for 10 seconds"],
+
+		"tips": [
+			"Effects of Guarantee of Death might be slow but they can be stacked on top of each other"
+		]
+	},
+	{
+		"name": "Luna",
+		"world": "7777",
+		"power": "D",
+		"fortitude": "C",
+		"tactical acumen": "S",
+		"fighting skill": "C",
+		"range": "A",
+		"arts": "S",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Luna.jpg",
+		"bio": "The Doctor of World 7777. Unlike her other counterparts, Luna focuses on the 'Doctor' part of her title. Her Arts have miraculous properties to it, allowing her to heal even the most grievous of wounds. One might even speculate that she can bring others back from the dead. However, there is a saying that a mage is at their most powerful at their time of death so perhaps, Luna has yet to reach her potential.",
+		"skills": [
+			"Let Me Protect You",
+			"Till I Fall",
+			"Don't Worry About Me..."
+		],
+		"moveset": ["Left/Right + A- A Sweet Familiar: Luna summons a Familiar that allows her to deal damage around the familiar",
+					"Up + A- Tempest: Luna throws a ball into the air that follows her around and provides her with buffs",
+					"Down + A- On My Last Legs: Luna rises up to the air and then, after some tie, fires off a beam of pure light, damaging all foes in its path"],
+
+		"tips": [
+			"The more hurt Luna gets, the stronger her Arts becomes."
+		]
+	},
+	{
+		"name": "Cado",
+		"world": "Unknown",
+		"power": "S",
+		"fortitude": "D",
+		"tactical acumen": "C",
+		"fighting skill": "B",
+		"range": "S",
+		"arts": "B",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Cado.jpg",
+		"bio": "Cado is a strange character. She claims to have travelled to different worlds, seen different cultures, a sort of multiverse, though it is unclear where she hailed from. Cado's fighting skill and tactical acumen leaves much to be desired but she is armed with a powerful weapon called the 'Bow' can destroy cities. It is also rumored that she is aware of her creator, something the other Doctors or Operators are able to do. Just what power does she hold?",
+		"skills": [
+			"Failnaught",
+			"Firework's Show",
+			"Rise above the Rest"
+		],
+		"moveset": ["Left/Right + A- Clear the Mind: Cado stops attacking to focus. If successful, she will gain 300%+ damage boost. High chance of failing",
+					"Up + A- Open Your Heart: Cado stops attacking to focus. If successful, she will gain 500%+ HP boost. High chance of failing",
+					"Down + A- Just My Luck: Cado stops attacking to focus and gains a +1% Luck increase. Cannot fail"],
+
+		"tips": [
+			"She is very RNG-based so make sure you use Just My Luck often before entering big fights. Luck does not degrade."
+		]
+	},
+	{
+		"name": "Gast",
+		"world": "6301",
+		"power": "A",
+		"fortitude": "A",
+		"tactical acumen": "C",
+		"fighting skill": "S",
+		"range": "A",
+		"arts": "A",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Gast.jpg",
+		"bio": "An operator from World 6301. Gast is a master assassin, trained by his world's Ascalon. He specializes in Higashi Assassination Arts, striking from the shadows or taking his enemies by surprise. His chain blade allows him to strike opponents from afar. He also has Fire Arts that can amplify his damage and allow him to even become intangible.",
+		"skills": [
+			"To Hell With You!",
+			"Enough of This!",
+			"For My Family and Clan"
+		],
+		"moveset": ["Left/Right + A- The Scorpion's Sting: Gast fires off his chain blade to snag an opponent and drag them to him, dealing damage",
+					"Up + A- Now You See: Gast becomes invisible. Upon breaking stealth, deals massive damage",
+					"Down + A- I Honor My Family: Gast enters Oni Mode which increases his movement speed by 50%"],
+
+		"tips": [
+			"Take the enemy from behind or by surprise. From there, Gast can instantly kill any foe."
+		]
+	},
+	{
+		"name": "Quila",
+		"world": "9999",
+		"power": "C",
+		"fortitude": "B",
+		"tactical acumen": "B",
+		"fighting skill": "C",
+		"range": "B",
+		"arts": "S",
+		"portrait": "https://raw.githubusercontent.com/EEEYYYAAAHHH/EEEYYYAAAHHH.github.io/main/Quila.jpg",
+		"bio": "The Operator from World 9999. Quila specializes in Water Arts that she can use to manipulate any body of water, whether from a lake, an ocean, or from a person. She can utilize healing, barriers, and purifications with just the flick of her wrist. She is not without her strength if no nearby water sources remain as she herself can act as it but leaves her exhausted after.",
+		"skills": [
+			"Splitting the Red Sea",
+			"Drink and Be Cleansed",
+			"Wash Away Your Sins"
+		],
+		"moveset": ["Left/Right + A- Smite: Quila summons a stream of water that can bounce from enemy to enemy, damaging them.",
+					"Up + A- Shield Wall: Quilla summons a wall that blocks all projectiles. Enemies can still move freely though they will be slowed.",
+					"Down + A- Witch's Stance: Quilla is able to summon a barrage of water jets that ignore resistance"],
+
+		"tips": [
+			"Quila can create any chokepoint into an impenetrable fortress." 
+		]
+	}
+]
